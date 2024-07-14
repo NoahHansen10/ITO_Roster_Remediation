@@ -14,7 +14,7 @@ $DN = "OU=Marketing,DC=domain100,DC=com"
 $csvFilePath = $args[0]
 $domain = $null
 $lineNumber = 2
-
+$email-domain = "@mtu.edu"
 # Check CSV file exists
 if (!(Test-Path -Path $csvFilePath)){
     Write-Host "Error: Input file '$csvFilePath' does not exist in current directory" -ForegroundColor Red -BackgroundColor Black
@@ -41,10 +41,11 @@ foreach ($User in $Users) {
         $Displayname = $User.Name
         $Firstname = $User.Firstname
         $Lastname = $User.Lastname
+        $Email = $User.Username + $email_domain
         $assignedSecurityGroup = $User.Group
         $UPN = $User.Username + $domain
         $Password = (ConvertTo-SecureString $User.TempPassword -AsPlainText -Force)
-        New-ADUser -Name "$Displayname" -DisplayName "$Displayname" -SamAccountName "$SAM" -UserPrincipalName "$UPN" -GivenName "$Firstname" -Surname "$Lastname" -AccountPassword $Password  -Enabled $true -Path "$DN" -ChangePasswordAtLogon $true -PasswordNeverExpires $false
+        New-ADUser -Name "$Displayname" -DisplayName "$Displayname" -SamAccountName "$SAM" -UserPrincipalName "$UPN" -GivenName "$Firstname" -Surname "$Lastname" -AccountPassword $Password -EmailAddress $Email -Enabled $true -Path "$DN" -ChangePasswordAtLogon $true -PasswordNeverExpires $false
         Add-ADGroupMember -Identity $assignedSecurityGroup -Members $SAM
         Write-Host "Created user: $UPN" -ForegroundColor Green
     }
